@@ -53,14 +53,17 @@ export default function HomePage(props) {
         },
       });
       console.log("Response", resp);
-      let user_imgs = []
+      let per_user = []
       resp.data.data.forEach((el)=>{
         if(el.user_uid === state.iop.userData.data.uid) {
           // setPostList(resp.data.data)
-          user_imgs.push(el)
+          el.username = state.iop.userData.data.username
+          per_user.push(el);
         }
     })
-    setPostList(user_imgs);
+    console.log(per_user);
+    setPostList(per_user);
+    
     } catch (e) {
       console.log("Error", e);
     }
