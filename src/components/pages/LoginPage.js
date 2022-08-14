@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navigate } from 'react-router';
 import axios from "axios";
@@ -9,11 +9,20 @@ import "../../App.css";
 
 
 export default function SignInPage() {
-  let data ={};
+  const [udata,setUdata] = useState();
   const [isLoggedIn,setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
+
+  const iop = {
+    isUserLoggedIn: isLoggedIn,
+    userData: udata
+  }
+
+  useEffect(() => {
+    localStorage.setItem('user', JSON.stringify(iop));
+  }, [iop]);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -28,17 +37,17 @@ export default function SignInPage() {
       );
       console.log("Response", JSON.stringify(resp.data));
       console.log("sccessfully logedin",JSON.stringify(resp.data))
-      data = resp.data
+      setUdata(resp.data);
       setIsLoggedIn(true);
       
     } catch (e) {
       console.log("WRONG CREDENTIALS", e);
     }
 
-    const iop = {
-      isUserLoggedIn: true/false,
-      userData: data
-    }
+    
+
+    
+    
     // fetch('http://localhost:3000/users/login', {
     // method: 'POST',
     // headers: {
@@ -60,7 +69,7 @@ export default function SignInPage() {
  
   }
   if(isLoggedIn) {
-    return (<Navigate to="/home" state={{data:data}}/>);
+    return (<Navigate to="/home" state={{data: iop}}/>);
   }
   return (
     <div className="text-center m-5-auto">
