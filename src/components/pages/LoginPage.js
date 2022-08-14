@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navigate } from 'react-router';
 import axios from "axios";
+import config from "../../config/dev.json";
 
 import "../../App.css";
 
@@ -29,7 +30,7 @@ export default function SignInPage() {
     let cred = {email : email, password: password}
     try {
       const resp = await axios.post(
-        `http://localhost:3000/users/login`,
+        `${config.ruby_host}/users/login`,
         cred,
         {
           "content-type": "application/json",
@@ -69,7 +70,8 @@ export default function SignInPage() {
  
   }
   if(isLoggedIn) {
-    return (<Navigate to="/home" state={{data: iop}}/>);
+    console.log(iop);
+    return (<Navigate to="/home" state={{iop}}/>);
   }
   return (
     <div className="text-center m-5-auto">

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Navigate } from 'react-router';
 import { v4 as uuid } from 'uuid';
 import axios from "axios";
+import config from "../../config/dev.json";
 
 import "../../App.css";
 
@@ -17,7 +18,7 @@ export default function SignUpPage() {
     let cred = {uid : uuid(), email : email, username: username, password: password, phone_no: phone_no}
     try {
       const resp = await axios.post(
-        `http://localhost:3000/users/create`,
+        `${config.ruby_host}/users/create`,
         cred,
         {
           "content-type": "application/json",

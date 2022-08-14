@@ -6,7 +6,8 @@ import axios from "axios";
 import config from "../../config/dev.json";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
-import { storage, ref } from "../../firebase.js";
+import { storage } from "../../firebase.js";
+import { ref } from "firebase/storage";
 import { getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -15,8 +16,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "../dialogs/alert.js";
+import { useLocation } from 'react-router-dom';
 
-export default function HomePage() {
+export default function HomePage(props) {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [postList, setPostList] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -28,6 +30,10 @@ export default function HomePage() {
     title: "",
     type: "success",
   });
+
+  const {state} = useLocation();
+
+
 
   const handleDialogClickOpen = () => {
     setOpenAddDialog(true);
@@ -43,11 +49,18 @@ export default function HomePage() {
       const resp = await axios.get(`${config.ruby_host}/posts/index`, {
         "content-type": "application/json",
         headers: {
-          uid: "testHeader",
+          uid: state.iop.userData.data.uid,
         },
       });
       console.log("Response", resp);
-      setPostList(resp.data.data);
+      let user_imgs = []
+      resp.data.data.forEach((el)=>{
+        if(el.user_uid === state.iop.userData.data.uid) {
+          // setPostList(resp.data.data)
+          user_imgs.push(el)
+        }
+    })
+    setPostList(user_imgs);
     } catch (e) {
       console.log("Error", e);
     }
@@ -58,7 +71,7 @@ export default function HomePage() {
       const resp = await axios.post(
         `${config.ruby_host}/posts/create`,
         {
-          user_uid: "test213138191",
+          user_uid: state.iop.userData.data.uid,
           img_url: imgUrl,
           caption: caption,
         },
