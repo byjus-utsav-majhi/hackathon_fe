@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../../css/Post.css";
 import { Avatar } from "@mui/material";
-export default function HomePage() {
+export default function Posts(props) {
   return (
     <div className="post">
       <div className="post__header">
@@ -14,11 +14,7 @@ export default function HomePage() {
         <h3>anime_pahe</h3>
       </div>
 
-      <img
-        className="post__image"
-        src="https://i.pinimg.com/736x/24/25/cf/2425cf64663863ee4f31adf1427d5943.jpg"
-        alt=""
-      ></img>
+      <img className="post__image" src={props.item.img_url} alt=""></img>
       <h4 className="post__text">
         <strong>anime_pahe</strong> random_user Yohoo satou gojou
       </h4>
