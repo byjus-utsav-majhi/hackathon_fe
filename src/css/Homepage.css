@@ -1,0 +1,24 @@
+.homepage__postsmain {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.app__headerImage {
+  object-fit: contain;
+  width: 150px;
+}
+
+.app__header {
+  background-color: white;
+  padding: 15px;
+  border-bottom: 1px solid lightgray;
+  object-fit: contain;
+}
+
+.app {
+  background-color: #fafafa;
+  height: 100vh;
+}
