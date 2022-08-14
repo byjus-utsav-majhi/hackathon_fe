@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Navigate } from 'react-router';
+import { v4 as uuid } from 'uuid';
+import axios from "axios";
 
 import "../../App.css";
 
@@ -7,13 +10,38 @@ export default function SignUpPage() {
   const [username, setUsername] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [phone, setPhone] = useState();
+  const [phone_no, setPhoneNo] = useState();
+  const [isRegistered,setIsRegistered] = useState(false);
+
+  const handleRegister = async e => {
+    let cred = {uid : uuid(), email : email, username: username, password: password, phone_no: phone_no}
+    try {
+      const resp = await axios.post(
+        `http://localhost:3000/users/create`,
+        cred,
+        {
+          "content-type": "application/json",
+        }
+      );
+      console.log("Response", JSON.stringify(resp.data));
+      console.log("sccessfully logedin",JSON.stringify(resp.data))
+      setIsRegistered(true)
+      
+    } catch (e) {
+      console.log("Please fill all the details", e);
+    }
+ 
+  }
+
+  if(isRegistered) {
+    return (<Navigate to="/"/>);
+  }
 
   return (
     <div className="text-center m-5-auto">
       <h2>Join us</h2>
       <h5>Create your personal account</h5>
-      <form action="/home">
+      <form onSubmit={handleRegister} action="/">
         <p>
           <label>Username</label>
           <br />
@@ -40,7 +68,7 @@ export default function SignUpPage() {
           <input
             type="text"
             name="phone"
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhoneNo(e.target.value)}
             required
           />
         </p>
