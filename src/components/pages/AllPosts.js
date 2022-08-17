@@ -20,17 +20,20 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 export default function AllPosts(props) {
-  console.log("YOHOOOOOO ALLPOSTS");
+  console.log("YOHOOOOOON AllPOSTS");
   let iop = {};
   if (window.localStorage.getItem("user")) {
     iop = JSON.parse(window.localStorage.getItem("user"));
     console.log("IOP DATA", iop);
   }
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
   const [postList, setPostList] = useState([]);
   const [progress, setProgress] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [captionDialog, setCaptionDialog] = useState();
+  const [editSelected, setEditSelected] = useState("");
   const [showAlert, setShowAlert] = useState({
     visible: false,
     msg: "",
@@ -46,6 +49,10 @@ export default function AllPosts(props) {
 
   const handleDialogClose = () => {
     setOpenAddDialog(false);
+  };
+
+  const handleEditDialogClose = () => {
+    setOpenEditDialog(false);
   };
 
   //To get all posts
@@ -89,6 +96,30 @@ export default function AllPosts(props) {
     }
   };
 
+  const editPost = async (imgUrl, caption, id) => {
+    try {
+      const resp = await axios.put(
+        `${config.ruby_host}/posts/update/${id}`,
+        {
+          user_uid: iop.userData.data.uid,
+          img_url: imgUrl,
+          caption: caption,
+        },
+        {
+          "content-type": "application/json",
+          headers: {
+            uid: "testHeader",
+          },
+        }
+      );
+      console.log("Response", resp);
+      await getAllPosts();
+      return { status: "Success" };
+    } catch (e) {
+      console.log("Error", e);
+      return { status: "Error" };
+    }
+  };
   useEffect(() => {
     if (window.localStorage.getItem("user")) {
       iop = JSON.parse(window.localStorage.getItem("user"));
@@ -105,6 +136,11 @@ export default function AllPosts(props) {
     if (e.target.files[0]) {
       setSelectedImage(e.target.files[0]);
     }
+  };
+
+  const setEditHandleChange = (id) => {
+    setEditSelected(id);
+    setOpenEditDialog(true);
   };
 
   useEffect(() => {
@@ -164,6 +200,49 @@ export default function AllPosts(props) {
     );
   };
 
+  const handleEditUpload = (id) => {
+    const newdate = new Date();
+    let imgName = selectedImage.name + newdate.toISOString();
+    const storageRef = ref(storage, `posts/${imgName}`);
+    const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const prog = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(prog);
+      },
+      (err) => console.log(err),
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log("Download URL", url);
+          editPost(url, captionDialog, id).then((res) => {
+            if (res.status === "Success") {
+              setShowAlert({
+                visible: true,
+                msg: "Successfully edited your post :)",
+                title: "Success",
+                type: "success",
+              });
+
+              handleEditDialogClose();
+            } else {
+              setShowAlert({
+                visible: true,
+                msg: "Error while saving your post :(",
+                title: "Error",
+                type: "error",
+              });
+              handleEditDialogClose();
+            }
+          });
+        });
+      }
+    );
+  };
+
   let navigate = useNavigate();
   const toAllpostNavigate = () => {
     let path = `/allposts`;
@@ -189,6 +268,29 @@ export default function AllPosts(props) {
           type={showAlert.type}
         />
       )}
+      <Dialog open={openEditDialog} onClose={handleEditDialogClose}>
+        <DialogTitle>Edit Post</DialogTitle>
+        <DialogContent>
+          <TextField
+            onChange={(e) => handleDialogCaptionChange(e.target.value)}
+            autoFocus
+            margin="dense"
+            id="caption"
+            label="Post Caption"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+          <input type="file" onChange={handleChange}></input>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditDialogClose}>Cancel</Button>
+          <Button onClick={async () => handleEditUpload(editSelected)}>
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={openAddDialog} onClose={handleDialogClose}>
         <DialogTitle>Add Post</DialogTitle>
         <DialogContent>
@@ -244,7 +346,12 @@ export default function AllPosts(props) {
       </div>
       <div className="homepage__postsmain">
         {postList.map((item, index) => (
-          <Posts key={index} item={item} />
+          <Posts
+            key={index}
+            item={item}
+            getAll={getAllPosts}
+            editId={setEditHandleChange}
+          />
         ))}
       </div>
     </div>
