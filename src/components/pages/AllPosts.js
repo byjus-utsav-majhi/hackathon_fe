@@ -22,6 +22,10 @@ import { useNavigate } from "react-router-dom";
 export default function AllPosts(props) {
   console.log("YOHOOOOOO ALLPOSTS");
   let iop = {};
+  if (window.localStorage.getItem("user")) {
+    iop = JSON.parse(window.localStorage.getItem("user"));
+    console.log("IOP DATA", iop);
+  }
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [postList, setPostList] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -86,8 +90,8 @@ export default function AllPosts(props) {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("user")) {
-      iop = JSON.parse(localStorage.getItem("user"));
+    if (window.localStorage.getItem("user")) {
+      iop = JSON.parse(window.localStorage.getItem("user"));
       console.log("IOP DATA", iop);
     }
     getAllPosts();
@@ -104,17 +108,18 @@ export default function AllPosts(props) {
   };
 
   useEffect(() => {
-    if (showAlert.visible){
-    const timer = setTimeout(() => {
-      setShowAlert({
-        visible: false,
-        msg: "",
-        title: "",
-        type: "success",
-      });
-    }, 1);
-    return () => clearTimeout(timer);
-  }}, [showAlert]);
+    if (showAlert.visible) {
+      const timer = setTimeout(() => {
+        setShowAlert({
+          visible: false,
+          msg: "",
+          title: "",
+          type: "success",
+        });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   const handleUpload = () => {
     const newdate = new Date();
@@ -159,20 +164,20 @@ export default function AllPosts(props) {
     );
   };
 
-  let navigate = useNavigate(); 
-  const toAllpostNavigate = () =>{ 
-    let path = `/allposts`; 
-    navigate(path);
-  }
-  function toMypostNavigate(){
-    let path = `/home`; 
+  let navigate = useNavigate();
+  const toAllpostNavigate = () => {
+    let path = `/allposts`;
     navigate(path);
   };
+  function toMypostNavigate() {
+    let path = `/home`;
+    navigate(path);
+  }
 
   function logoutNavigate() {
-    let path = `/` ;
-    localStorage.clear(); 
-    navigate(path) ;
+    let path = `/`;
+    window.localStorage.clear();
+    navigate(path);
   }
 
   return (

@@ -19,7 +19,7 @@ export default function SignInPage() {
   };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(iop));
+    window.localStorage.setItem("user", JSON.stringify(iop));
   }, [iop]);
 
   const handleSubmit = async (e) => {

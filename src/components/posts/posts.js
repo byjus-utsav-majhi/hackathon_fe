@@ -10,8 +10,10 @@ import axios from "axios";
 
 export default function Posts(props) {
   let iop = {};
-  if (localStorage.getItem("user")) {
-    iop = JSON.parse(localStorage.getItem("user"));
+  if (window.window.window.window.window.localStorage.getItem("user")) {
+    iop = JSON.parse(
+      window.window.window.window.window.localStorage.getItem("user")
+    );
     console.log("IOP DATA", iop);
   }
   const deletePost = async (id) => {
@@ -34,12 +36,15 @@ export default function Posts(props) {
   return (
     <div className="post">
       <div className="post__header">
-        <Avatar
-          className="post__avatar"
-          alt="anime_pahe"
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRqRyIiwYCq4s-fZi1zdmyfSuIPUvg9EyZ_Q&usqp=CAU"
-        />
-        <h3 style={{ fontWeight: "bolder" }}>{props.item.username}</h3>
+        <div className="post__inner">
+          <Avatar
+            className="post__avatar"
+            alt="anime_pahe"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRqRyIiwYCq4s-fZi1zdmyfSuIPUvg9EyZ_Q&usqp=CAU"
+          />
+          <h3 style={{ fontWeight: "bolder" }}>{props.item.username}</h3>
+        </div>
+
         {isOwnPost && (
           <div className="post__deleteicon">
             <IconButton
@@ -48,12 +53,15 @@ export default function Posts(props) {
             >
               <DeleteIcon />
             </IconButton>
+
+            <IconButton
+              aria-label="edit"
+              onClick={() => props.editId(props.item.id)}
+            >
+              <EditIcon />
+            </IconButton>
           </div>
         )}
-
-        <IconButton aria-label="edit">
-          <EditIcon />
-        </IconButton>
       </div>
 
       <img className="post__image" src={props.item.img_url} alt=""></img>

@@ -22,15 +22,18 @@ import { useNavigate } from "react-router-dom";
 export default function MyPosts(props) {
   console.log("YOHOOOOOON MYPOSTS");
   let iop = {};
-  if (localStorage.getItem("user")) {
-    iop = JSON.parse(localStorage.getItem("user"));
+  if (window.localStorage.getItem("user")) {
+    iop = JSON.parse(window.localStorage.getItem("user"));
     console.log("IOP DATA", iop);
   }
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
   const [postList, setPostList] = useState([]);
   const [progress, setProgress] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [captionDialog, setCaptionDialog] = useState();
+  const [editSelected, setEditSelected] = useState("");
   const [showAlert, setShowAlert] = useState({
     visible: false,
     msg: "",
@@ -48,22 +51,8 @@ export default function MyPosts(props) {
     setOpenAddDialog(false);
   };
 
-  const deletePost = async (id) => {
-    console.log("Deleting Id", id);
-    try {
-      const resp = await axios.delete(
-        `${config.ruby_host}/posts/delete/${id}`,
-        {
-          "content-type": "application/json",
-          headers: {
-            uid: iop.userData.data.uid,
-          },
-        }
-      );
-      console.log("Response", resp);
-    } catch (e) {
-      console.log("Error", e);
-    }
+  const handleEditDialogClose = () => {
+    setOpenEditDialog(false);
   };
 
   //To get all posts
@@ -107,9 +96,33 @@ export default function MyPosts(props) {
     }
   };
 
+  const editPost = async (imgUrl, caption, id) => {
+    try {
+      const resp = await axios.put(
+        `${config.ruby_host}/posts/update/${id}`,
+        {
+          user_uid: iop.userData.data.uid,
+          img_url: imgUrl,
+          caption: caption,
+        },
+        {
+          "content-type": "application/json",
+          headers: {
+            uid: "testHeader",
+          },
+        }
+      );
+      console.log("Response", resp);
+      await getAllPosts();
+      return { status: "Success" };
+    } catch (e) {
+      console.log("Error", e);
+      return { status: "Error" };
+    }
+  };
   useEffect(() => {
-    if (localStorage.getItem("user")) {
-      iop = JSON.parse(localStorage.getItem("user"));
+    if (window.localStorage.getItem("user")) {
+      iop = JSON.parse(window.localStorage.getItem("user"));
       console.log("IOP DATA", iop);
     }
     getAllPosts();
@@ -125,6 +138,11 @@ export default function MyPosts(props) {
     }
   };
 
+  const setEditHandleChange = (id) => {
+    setEditSelected(id);
+    setOpenEditDialog(true);
+  };
+
   useEffect(() => {
     if (showAlert.visible) {
       const timer = setTimeout(() => {
@@ -134,7 +152,7 @@ export default function MyPosts(props) {
           title: "",
           type: "success",
         });
-      }, 1);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
@@ -182,6 +200,49 @@ export default function MyPosts(props) {
     );
   };
 
+  const handleEditUpload = (id) => {
+    const newdate = new Date();
+    let imgName = selectedImage.name + newdate.toISOString();
+    const storageRef = ref(storage, `posts/${imgName}`);
+    const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const prog = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(prog);
+      },
+      (err) => console.log(err),
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log("Download URL", url);
+          editPost(url, captionDialog, id).then((res) => {
+            if (res.status === "Success") {
+              setShowAlert({
+                visible: true,
+                msg: "Successfully edited your post :)",
+                title: "Success",
+                type: "success",
+              });
+
+              handleEditDialogClose();
+            } else {
+              setShowAlert({
+                visible: true,
+                msg: "Error while saving your post :(",
+                title: "Error",
+                type: "error",
+              });
+              handleEditDialogClose();
+            }
+          });
+        });
+      }
+    );
+  };
+
   let navigate = useNavigate();
   const toAllpostNavigate = () => {
     let path = `/allposts`;
@@ -193,9 +254,9 @@ export default function MyPosts(props) {
   }
 
   function logoutNavigate() {
-    let path = `/` ;
-    localStorage.clear(); 
-    navigate(path) ;
+    let path = `/`;
+    window.localStorage.clear();
+    navigate(path);
   }
 
   return (
@@ -207,6 +268,29 @@ export default function MyPosts(props) {
           type={showAlert.type}
         />
       )}
+      <Dialog open={openEditDialog} onClose={handleEditDialogClose}>
+        <DialogTitle>Edit Post</DialogTitle>
+        <DialogContent>
+          <TextField
+            onChange={(e) => handleDialogCaptionChange(e.target.value)}
+            autoFocus
+            margin="dense"
+            id="caption"
+            label="Post Caption"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+          <input type="file" onChange={handleChange}></input>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditDialogClose}>Cancel</Button>
+          <Button onClick={async () => handleEditUpload(editSelected)}>
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={openAddDialog} onClose={handleDialogClose}>
         <DialogTitle>Add Post</DialogTitle>
         <DialogContent>
@@ -264,7 +348,12 @@ export default function MyPosts(props) {
         {postList
           .filter((e) => e.uid === iop.userData.data.uid)
           .map((item, index) => (
-            <Posts key={index} item={item} getAll={getAllPosts} />
+            <Posts
+              key={index}
+              item={item}
+              getAll={getAllPosts}
+              editId={setEditHandleChange}
+            />
           ))}
       </div>
     </div>
