@@ -12,7 +12,7 @@ function App() {
     <Router>
       <Routes>
         <Route exact path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route exact path="/register" element={<RegisterPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
         <Route path="/home" element={<MyPosts />} />
         <Route path="/allposts" element={<AllPosts />} />
