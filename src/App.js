@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import ForgetPasswordPage from "./components/pages/ForgetPasswordPage";
-import HomePage from "./components/pages/HomePage";
-
 import "./App.css";
+import MyPosts from "./components/pages/MyPosts";
+import AllPosts from "./components/pages/AllPosts";
 
 function App() {
   return (
@@ -14,7 +14,8 @@ function App() {
         <Route exact path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/home" element={<MyPosts />} />
+        <Route path="/allposts" element={<AllPosts />} />
       </Routes>
     </Router>
   );

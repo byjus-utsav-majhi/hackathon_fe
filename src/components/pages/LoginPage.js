@@ -1,54 +1,42 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Navigate } from 'react-router';
+import { Navigate } from "react-router";
 import axios from "axios";
 import config from "../../config/dev.json";
 
 import "../../App.css";
 
-
-
 export default function SignInPage() {
-  const [udata,setUdata] = useState();
-  const [isLoggedIn,setIsLoggedIn] = useState(false);
+  const [udata, setUdata] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const iop = {
     isUserLoggedIn: isLoggedIn,
-    userData: udata
-  }
+    userData: udata,
+  };
 
   useEffect(() => {
-    localStorage.setItem('user', JSON.stringify(iop));
+    localStorage.setItem("user", JSON.stringify(iop));
   }, [iop]);
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let cred = {email : email, password: password}
+    let cred = { email: email, password: password };
     try {
-      const resp = await axios.post(
-        `${config.ruby_host}/users/login`,
-        cred,
-        {
-          "content-type": "application/json",
-        }
-      );
+      const resp = await axios.post(`${config.ruby_host}/users/login`, cred, {
+        "content-type": "application/json",
+      });
       console.log("Response", JSON.stringify(resp.data));
-      console.log("sccessfully logedin",JSON.stringify(resp.data))
+      console.log("sccessfully logedin", JSON.stringify(resp.data));
       setUdata(resp.data);
       setIsLoggedIn(true);
-      
     } catch (e) {
       console.log("WRONG CREDENTIALS", e);
     }
 
-    
-
-    
-    
     // fetch('http://localhost:3000/users/login', {
     // method: 'POST',
     // headers: {
@@ -67,11 +55,10 @@ export default function SignInPage() {
     //     console.log("wrong credentials")
     //   }
     // })
- 
-  }
-  if(isLoggedIn) {
-    console.log(iop);
-    return (<Navigate to="/home" state={{iop}}/>);
+  };
+  if (isLoggedIn) {
+    console.log("IOP", iop);
+    return <Navigate to="/home" state={{ iop }} />;
   }
   return (
     <div className="text-center m-5-auto">
@@ -80,9 +67,11 @@ export default function SignInPage() {
         <p>
           <label>email address</label>
           <br />
-          <input 
-          type="text" name="email" required
-          onChange={e => setEmail(e.target.value)}
+          <input
+            type="text"
+            name="email"
+            required
+            onChange={(e) => setEmail(e.target.value)}
           />
         </p>
         <p>
@@ -92,17 +81,19 @@ export default function SignInPage() {
           </Link>
           <br />
           <input
-          type="password" name="password" required
-          onChange={e => setPassword(e.target.value)}
+            type="password"
+            name="password"
+            required
+            onChange={(e) => setPassword(e.target.value)}
           />
         </p>
-        <p >
+        <p>
           <button id="sub_btn" type="submit">
             Login
           </button>
         </p>
       </form>
-      
+
       <footer>
         <p>
           First time? <Link to="/register">Create an account</Link>.

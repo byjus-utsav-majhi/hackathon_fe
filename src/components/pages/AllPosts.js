@@ -17,8 +17,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "../dialogs/alert.js";
 import { useLocation } from "react-router-dom";
+import { Navigate } from "react-router";
 
-export default function HomePage(props) {
+export default function AllPosts(props) {
+  console.log("YOHOOOOOO ALLPOSTS");
+  let iop = {};
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [postList, setPostList] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -47,20 +50,11 @@ export default function HomePage(props) {
       const resp = await axios.get(`${config.ruby_host}/posts/index`, {
         "content-type": "application/json",
         headers: {
-          uid: state.iop.userData.data.uid,
+          uid: iop.userData.data.uid,
         },
       });
       console.log("Response", resp);
-      let per_user = [];
-      resp.data.data.forEach((el) => {
-        if (el.user_uid === state.iop.userData.data.uid) {
-          // setPostList(resp.data.data)
-          el.username = state.iop.userData.data.username;
-          per_user.push(el);
-        }
-      });
-      console.log(per_user);
-      setPostList(per_user);
+      setPostList(resp.data.data);
     } catch (e) {
       console.log("Error", e);
     }
@@ -71,7 +65,7 @@ export default function HomePage(props) {
       const resp = await axios.post(
         `${config.ruby_host}/posts/create`,
         {
-          user_uid: state.iop.userData.data.uid,
+          user_uid: iop.userData.data.uid,
           img_url: imgUrl,
           caption: caption,
         },
@@ -92,6 +86,10 @@ export default function HomePage(props) {
   };
 
   useEffect(() => {
+    if (localStorage.getItem("user")) {
+      iop = JSON.parse(localStorage.getItem("user"));
+      console.log("IOP DATA", iop);
+    }
     getAllPosts();
   }, []);
 
@@ -160,6 +158,13 @@ export default function HomePage(props) {
     );
   };
 
+  const toMypostNavigate = () => {
+    return <Navigate to="/home" />;
+  };
+
+  const toAllpostNavigate = () => {
+    return <Navigate to="/allposts" />;
+  };
   return (
     <div className="app">
       {showAlert.visible && (
@@ -212,10 +217,10 @@ export default function HomePage(props) {
         />
         <div className="tabs">
           <div>
-            <Button>All Posts</Button>
+            <Button onClick={toAllpostNavigate}>All Posts</Button>
           </div>
           <div>
-            <Button>My Posts</Button>
+            <Button onClick={toMypostNavigate}>My Posts</Button>
           </div>
         </div>
       </div>

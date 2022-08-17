@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Navigate } from 'react-router';
-import { v4 as uuid } from 'uuid';
+import { Navigate } from "react-router";
+import { v4 as uuid } from "uuid";
 import axios from "axios";
 import config from "../../config/dev.json";
 
@@ -12,30 +12,30 @@ export default function SignUpPage() {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [phone_no, setPhoneNo] = useState();
-  const [isRegistered,setIsRegistered] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  const handleRegister = async e => {
-    let cred = {uid : uuid(), email : email, username: username, password: password, phone_no: phone_no}
+  const handleRegister = async (e) => {
+    let cred = {
+      uid: uuid(),
+      email: email,
+      username: username,
+      password: password,
+      phone_no: phone_no,
+    };
     try {
-      const resp = await axios.post(
-        `${config.ruby_host}/users/create`,
-        cred,
-        {
-          "content-type": "application/json",
-        }
-      );
+      const resp = await axios.post(`${config.ruby_host}/users/create`, cred, {
+        "content-type": "application/json",
+      });
       console.log("Response", JSON.stringify(resp.data));
-      console.log("sccessfully logedin",JSON.stringify(resp.data))
-      setIsRegistered(true)
-      
+      console.log("sccessfully loggedin", JSON.stringify(resp.data));
+      setIsRegistered(true);
     } catch (e) {
       console.log("Please fill all the details", e);
     }
- 
-  }
+  };
 
-  if(isRegistered) {
-    return (<Navigate to="/"/>);
+  if (isRegistered) {
+    return <Navigate to="/" />;
   }
 
   return (
