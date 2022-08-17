@@ -15,6 +15,7 @@ export default function SignUpPage() {
   const [isRegistered, setIsRegistered] = useState(false);
 
   const handleRegister = async (e) => {
+    e.preventDefault();
     let cred = {
       uid: uuid(),
       email: email,
