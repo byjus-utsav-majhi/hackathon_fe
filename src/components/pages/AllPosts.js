@@ -17,7 +17,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "../dialogs/alert.js";
 import { useLocation } from "react-router-dom";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function AllPosts(props) {
   console.log("YOHOOOOOO ALLPOSTS");
@@ -104,6 +104,7 @@ export default function AllPosts(props) {
   };
 
   useEffect(() => {
+    if (showAlert.visible){
     const timer = setTimeout(() => {
       setShowAlert({
         visible: false,
@@ -111,9 +112,9 @@ export default function AllPosts(props) {
         title: "",
         type: "success",
       });
-    }, 5000);
+    }, 1);
     return () => clearTimeout(timer);
-  }, [showAlert]);
+  }}, [showAlert]);
 
   const handleUpload = () => {
     const newdate = new Date();
@@ -158,13 +159,16 @@ export default function AllPosts(props) {
     );
   };
 
-  const toMypostNavigate = () => {
-    return <Navigate to="/home" />;
+  let navigate = useNavigate(); 
+  const toAllpostNavigate = () =>{ 
+    let path = `/allposts`; 
+    navigate(path);
+  }
+  function toMypostNavigate(){
+    let path = `/home`; 
+    navigate(path);
   };
 
-  const toAllpostNavigate = () => {
-    return <Navigate to="/allposts" />;
-  };
   return (
     <div className="app">
       {showAlert.visible && (

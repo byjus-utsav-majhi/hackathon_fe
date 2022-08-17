@@ -17,7 +17,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "../dialogs/alert.js";
 import { useLocation } from "react-router-dom";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+
 
 export default function MyPosts(props) {
   console.log("YOHOOOOOON MYPOSTS");
@@ -63,12 +64,7 @@ export default function MyPosts(props) {
       console.log("Error", e);
     }
   };
-  const toMypostNavigate = () => {
-    return <Navigate to="/home" />;
-  };
-  const toAllpostNavigate = () => {
-    return <Navigate to="/allposts" />;
-  };
+  
   const savePost = async (imgUrl, caption) => {
     try {
       const resp = await axios.post(
@@ -95,6 +91,10 @@ export default function MyPosts(props) {
   };
 
   useEffect(() => {
+    if (localStorage.getItem("user")) {
+      iop = JSON.parse(localStorage.getItem("user"));
+      console.log("IOP DATA", iop);
+    }
     getAllPosts();
   }, []);
 
@@ -109,6 +109,7 @@ export default function MyPosts(props) {
   };
 
   useEffect(() => {
+    if (showAlert.visible){
     const timer = setTimeout(() => {
       setShowAlert({
         visible: false,
@@ -116,9 +117,9 @@ export default function MyPosts(props) {
         title: "",
         type: "success",
       });
-    }, 5000);
+    }, 1);
     return () => clearTimeout(timer);
-  }, [showAlert]);
+  }}, [showAlert]);
 
   const handleUpload = () => {
     const newdate = new Date();
@@ -161,6 +162,18 @@ export default function MyPosts(props) {
         });
       }
     );
+  };
+
+  
+  
+  let navigate = useNavigate(); 
+  const toAllpostNavigate = () =>{ 
+    let path = `/allposts`; 
+    navigate(path);
+  }
+  function toMypostNavigate(){
+    let path = `/home`; 
+    navigate(path);
   };
 
   return (
