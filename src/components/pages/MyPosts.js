@@ -19,7 +19,6 @@ import Alert from "../dialogs/alert.js";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-
 export default function MyPosts(props) {
   console.log("YOHOOOOOON MYPOSTS");
   let iop = {};
@@ -49,6 +48,24 @@ export default function MyPosts(props) {
     setOpenAddDialog(false);
   };
 
+  const deletePost = async (id) => {
+    console.log("Deleting Id", id);
+    try {
+      const resp = await axios.delete(
+        `${config.ruby_host}/posts/delete/${id}`,
+        {
+          "content-type": "application/json",
+          headers: {
+            uid: iop.userData.data.uid,
+          },
+        }
+      );
+      console.log("Response", resp);
+    } catch (e) {
+      console.log("Error", e);
+    }
+  };
+
   //To get all posts
   const getAllPosts = async () => {
     try {
@@ -64,7 +81,7 @@ export default function MyPosts(props) {
       console.log("Error", e);
     }
   };
-  
+
   const savePost = async (imgUrl, caption) => {
     try {
       const resp = await axios.post(
@@ -109,17 +126,18 @@ export default function MyPosts(props) {
   };
 
   useEffect(() => {
-    if (showAlert.visible){
-    const timer = setTimeout(() => {
-      setShowAlert({
-        visible: false,
-        msg: "",
-        title: "",
-        type: "success",
-      });
-    }, 1);
-    return () => clearTimeout(timer);
-  }}, [showAlert]);
+    if (showAlert.visible) {
+      const timer = setTimeout(() => {
+        setShowAlert({
+          visible: false,
+          msg: "",
+          title: "",
+          type: "success",
+        });
+      }, 1);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   const handleUpload = () => {
     const newdate = new Date();
@@ -164,17 +182,15 @@ export default function MyPosts(props) {
     );
   };
 
-  
-  
-  let navigate = useNavigate(); 
-  const toAllpostNavigate = () =>{ 
-    let path = `/allposts`; 
-    navigate(path);
-  }
-  function toMypostNavigate(){
-    let path = `/home`; 
+  let navigate = useNavigate();
+  const toAllpostNavigate = () => {
+    let path = `/allposts`;
     navigate(path);
   };
+  function toMypostNavigate() {
+    let path = `/home`;
+    navigate(path);
+  }
 
   return (
     <div className="app">
@@ -239,7 +255,7 @@ export default function MyPosts(props) {
         {postList
           .filter((e) => e.uid === iop.userData.data.uid)
           .map((item, index) => (
-            <Posts key={index} item={item} />
+            <Posts key={index} item={item} getAll={getAllPosts} />
           ))}
       </div>
     </div>

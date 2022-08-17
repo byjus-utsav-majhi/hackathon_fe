@@ -5,6 +5,7 @@
   margin-bottom: 45px;
   border-radius: 15px;
 }
+
 .post__image {
   width: 100%;
   object-fit: contain;
@@ -25,4 +26,9 @@
 
 .post__avatar {
   margin-right: 10px;
+}
+
+.post__deleteicon {
+  flex-direction: row;
+  margin-left: 49%;
 }
