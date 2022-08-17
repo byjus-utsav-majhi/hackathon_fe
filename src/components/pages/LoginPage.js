@@ -34,6 +34,7 @@ export default function SignInPage() {
       setUdata(resp.data);
       setIsLoggedIn(true);
     } catch (e) {
+      alert("Enter correct credentials");
       console.log("WRONG CREDENTIALS", e);
     }
 

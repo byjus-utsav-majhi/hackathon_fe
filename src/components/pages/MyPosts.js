@@ -192,6 +192,12 @@ export default function MyPosts(props) {
     navigate(path);
   }
 
+  function logoutNavigate() {
+    let path = `/` ;
+    localStorage.clear(); 
+    navigate(path) ;
+  }
+
   return (
     <div className="app">
       {showAlert.visible && (
@@ -248,6 +254,9 @@ export default function MyPosts(props) {
           </div>
           <div>
             <Button onClick={toMypostNavigate}>My Posts</Button>
+          </div>
+          <div>
+            <Button onClick={logoutNavigate}>Log out</Button>
           </div>
         </div>
       </div>
